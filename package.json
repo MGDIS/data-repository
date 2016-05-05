@@ -1,0 +1,34 @@
+{
+  "name": "data-repository",
+  "version": "0.0.1",
+  "description": "Saves JSON object into relational database for reporting",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "data-repository",
+    "SQL92",
+    "reporting",
+    "BI"
+  ],
+  "author": " <Johan Le Lan>",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "config": "^1.20.1",
+    "cors": "^2.7.1",
+    "express": "^4.13.4",
+    "knex": "^0.10.0",
+    "node-uuid": "^1.4.7",
+    "serialize-error": "^2.0.0",
+    "when": "^3.7.7",
+    "winston": "^2.2.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5",
+    "request": "^2.72.0",
+    "should": "^8.3.1",
+    "sqlite3": "^3.1.3"
+  }
+}
