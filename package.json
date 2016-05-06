@@ -4,7 +4,8 @@
   "description": "Saves JSON object into relational database for reporting",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -t 20000 test/**/*.js",
+    "cibuild": "./node_modules/.bin/istanbul cover --dir=build/coverage _mocha test/**/*.js -- -t 20000 -R xunit-file; mkdir build/report; mv xunit.xml build/report/TESTS-xunit.xml"
   },
   "keywords": [
     "data-repository",
@@ -16,14 +17,17 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.0",
+    "cibuild-utils": "^0.2.1",
     "config": "^1.20.1",
     "cors": "^2.7.1",
     "express": "^4.13.4",
+    "istanbul": "^0.4.3",
     "knex": "^0.10.0",
     "lodash": "^4.11.2",
     "node-uuid": "^1.4.7",
     "when": "^3.7.7",
-    "winston": "^2.2.0"
+    "winston": "^2.2.0",
+    "xunit-file": "0.0.9"
   },
   "devDependencies": {
     "mocha": "^2.4.5",
