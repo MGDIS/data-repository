@@ -1,0 +1,51 @@
+{
+  "_id": "572cc4c8cb460381d417ed27",
+  "index": 0,
+  "guid": "0f081573-1a6e-44bc-a6a9-517f5a537ea8",
+  "isActive": false,
+  "balance": "$1,972.43",
+  "picture": "http://placehold.it/32x32",
+  "age": 23,
+  "eyeColor": "blue",
+  "name": "Joanna Winters",
+  "gender": "female",
+  "company": "TERRAGO",
+  "email": "joannawinters@terrago.com",
+  "phone": "+1 (870) 571-2267",
+  "address": {
+    "number": 527,
+    "street": "Florence Avenue",
+    "city": "Trona",
+    "state": "California",
+    "zipcode": 6149
+  },
+  "about": "Qui sit consectetur fugiat aute labore tempor amet. Aute laboris exercitation Lorem enim dolor magna Lorem proident nostrud dolore ea. Proident anim commodo ex amet deserunt aute incididunt id do id ut. Qui Lorem ullamco ullamco nostrud sint ea exercitation.\r\n",
+  "registered": "2014-11-15T04:17:27 -01:00",
+  "latitude": -48.946857,
+  "longitude": 10.583642,
+  "tags": [
+    "ad",
+    "nostrud",
+    "excepteur",
+    "commodo",
+    "ex",
+    "cillum",
+    "ullamco"
+  ],
+  "friends": [
+    {
+      "id": 0,
+      "name": "Shana Riggs"
+    },
+    {
+      "id": 1,
+      "name": "Luna Brennan"
+    },
+    {
+      "id": 2,
+      "name": "Gray Berry"
+    }
+  ],
+  "greeting": "Hello, Joanna Winters! You have 5 unread messages.",
+  "favoriteFruit": "banana"
+}

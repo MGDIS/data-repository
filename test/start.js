@@ -14,6 +14,9 @@ var app = require('../src/app');
 var logger = winston.loggers.get('data-repository-test');
 var db = undefined;
 
+/**
+ * Start the service to invoke HTTP requests
+ */
 before(function(donePreparing) {
   this.timeout(3000);
   fs.unlink(config.db.connection.filename, function() {
@@ -24,6 +27,9 @@ before(function(donePreparing) {
   });
 });
 
+/**
+ * After remove this database file
+ */
 after(function(doneClosing) {
   // remove db file
   fs.unlink(config.db.connection.filename, doneClosing);
@@ -40,7 +46,6 @@ it('Should insert incoming JSON object', function(done) {
     url: 'http://localhost:' + app.port + '/' + table,
     json: json
   }, function(err, response) {
-    logger.info('Get response %s %s', response.statusCode, response.body);
     response.should.be.an.object;
     response.should.have.property('statusCode', 201);
     response.should.have.property('body');
@@ -84,7 +89,6 @@ it('Should alter the table with a new string property', function(done) {
     json: json
   }, function (err, response) {
     if (err) done(err);
-    logger.info('Get response %s %s', response.statusCode, response.body);
     response.should.be.an.object;
     response.should.have.property('statusCode', 201);
     response.should.have.property('body');
@@ -129,8 +133,7 @@ it('Should add a new boolean property', function(done) {
     method: 'POST',
     url: 'http://localhost:' + app.port + '/' + table,
     json: json
-  }, function(err, response) {
-    logger.info('Get response %s %s', response.statusCode, response.body);
+  }, function(err, response) {;
     response.should.be.an.object;
     response.should.have.property('statusCode', 201);
     response.should.have.property('body');
@@ -231,7 +234,6 @@ it('Should add a new number property', function(done) {
     url: 'http://localhost:' + app.port + '/' + table,
     json: json
   }, function(err, response) {
-    logger.info('Get response %s %s', response.statusCode, response.body);
     response.should.be.an.object;
     response.should.have.property('statusCode', 201);
     response.should.have.property('body');
@@ -281,7 +283,6 @@ it('Should manage nested property', function(done) {
     url: 'http://localhost:' + app.port + '/' + table,
     json: json
   }, function (err, response) {
-    logger.info('Get response %s %s', response.statusCode, response.body);
     response.should.be.an.object;
     response.should.have.property('statusCode', 201);
     response.should.have.property('body');
@@ -312,7 +313,7 @@ it('Should manage nested property', function(done) {
                   db.select().from(nestedTable).then(function (nestedResults) {
                     nestedResults.should.be.an.array;
                     nestedResults.length.should.be.greaterThan(0);
-                    nestedResults[nestedResults.length - 1].should.have.property('id', results[results.length -1][nested]);
+                    nestedResults[nestedResults.length - 1].should.have.property('_id', results[results.length -1][nested]);
                     nestedResults[nestedResults.length - 1].should.have.property('key', object['key']);
                     nestedResults[nestedResults.length - 1].should.have.property('key2', object['key2']);
                     nestedResults[nestedResults.length - 1].should.have.property('key3', 1/*object['key3']*/);
@@ -332,7 +333,6 @@ it('Should manage nested property', function(done) {
 it('Should manage multi-valued property', function(done) {
   var table = 'test';
   var array = 'array';
-  var properties = [array];
   var json = {};
   json[array] = [
     {
@@ -353,7 +353,6 @@ it('Should manage multi-valued property', function(done) {
     url: 'http://localhost:' + app.port + '/' + table,
     json: json
   }, function(err, response) {
-    logger.info('Get response %s %s', response.statusCode, response.body);
     response.should.be.an.object;
     response.should.have.property('statusCode', 201);
     response.should.have.property('body');
@@ -394,5 +393,99 @@ it('Should manage multi-valued property', function(done) {
         });
       }
     });
+  });
+});
+
+it('Should manage real world JSON', function(done) {
+  this.timeout(5000);
+  var table = 'reals';
+  var tags = table + '_tags';
+  var friends = table + '_friends';
+  var addresses = table + '_address';
+  request({
+    method: 'POST',
+    url: 'http://localhost:' + app.port + '/' + table,
+    json: require('./resources/sample.json')
+  }, function(err, response) {
+    response.should.be.an.object;
+    response.should.have.property('statusCode', 201);
+    response.should.have.property('body');
+    response.body.should.be.an.object;
+    response.body.should.have.property('saved', true);
+    // check if table test exists
+    var rowId = undefined;
+    var addressId = undefined;
+    db.schema.hasTable(table).then(function (exists) {
+      if (!exists) {
+        done('Table ' + table + ' should exist');
+      } else {
+        db.select().from(table).then(function(results) {
+          results.should.be.an.array;
+          results.should.have.length(1);
+          results[0].should.have.property('_id');
+          results[0].should.have.property('address');
+          rowId = results[0]['_id'];
+          addressId = results[0]['address'];
+        });
+      }
+    }).then(db.select().from(addresses).then(function (exists) {
+      if (!exists) {
+        done('Table ' + addresses + ' should exist');
+      } else {
+        db.select().from(addresses).then(function(results) {
+          results.should.be.an.array;
+          results.should.have.length(1);
+          results[0].should.have.property('_id', addressId);
+          results[0].should.have.property('number', 527);
+          results[0].should.have.property('street', 'Florence Avenue');
+          results[0].should.have.property('city', 'Trona');
+          results[0].should.have.property('state', 'California');
+          results[0].should.have.property('zipcode', 6149);
+          results[0].should.not.have.property('_fid');
+        });
+      }
+    })).then(db.select().from(tags).then(function (exists) {
+      if (!exists) {
+        done('Table ' + tags + ' should exist');
+      } else {
+        db.select().from(tags).then(function(results) {
+          results.should.be.an.array;
+          results.should.have.length(7);
+          results[0].should.have.property('value', 'ad');
+          results[0].should.have.property('_fid', rowId);
+          results[1].should.have.property('value', 'nostrud');
+          results[1].should.have.property('_fid', rowId);
+          results[2].should.have.property('value', 'excepteur');
+          results[2].should.have.property('_fid', rowId);
+          results[3].should.have.property('value', 'commodo');
+          results[3].should.have.property('_fid', rowId);
+          results[4].should.have.property('value', 'ex');
+          results[4].should.have.property('_fid', rowId);
+          results[5].should.have.property('value', 'cillum');
+          results[5].should.have.property('_fid', rowId);
+          results[6].should.have.property('value', 'ullamco');
+          results[6].should.have.property('_fid', rowId);
+        });
+      }
+    })).then(db.select().from(friends).then(function (exists) {
+      if (!exists) {
+        done('Table ' + friends + ' should exist');
+      } else {
+        db.select().from(friends).then(function(results) {
+          results.should.be.an.array;
+          results.should.have.length(3);
+          results[0].should.have.property('id', 0);
+          results[0].should.have.property('name', 'Shana Riggs');
+          results[0].should.have.property('_fid', rowId);
+          results[1].should.have.property('id', 1);
+          results[1].should.have.property('name', 'Luna Brennan');
+          results[1].should.have.property('_fid', rowId);
+          results[2].should.have.property('id', 2);
+          results[2].should.have.property('name', 'Gray Berry');
+          results[2].should.have.property('_fid', rowId);
+          done();
+        });
+      }
+    }));
   });
 });

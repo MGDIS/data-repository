@@ -53,9 +53,13 @@ function toDatabase(db, tableName, json) {
             delete json[key];
             if (values.length > 0) {
               when.map(values, function(val) {
+                if (typeof val !== 'object') {
+                  // array of primitive type
+                  val = {value: val};
+                }
                 // modify each array values with current row identifier
                 val._fid = json[columnIdentifier];
-                return toDatabase(db, objectNameTable, val);
+                toDatabase(db, objectNameTable, val);
               });
             }
           } else {
@@ -66,7 +70,7 @@ function toDatabase(db, tableName, json) {
             // set the foreign key to current json
             json[key] = id;
             // need to force the nested id object
-            value.id = id;
+            value[columnIdentifier] = id;
             // create the nested table and insert the modified nested object
             toDatabase(db, objectNameTable, value);
           }
