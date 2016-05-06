@@ -87,6 +87,7 @@ function toDatabase(db, tableName, json) {
     return db.schema.createTable(tableName, function (table) {
       // generate technical identifier
       json[columnIdentifier] = json[columnIdentifier] || uuid.v4();
+      table.timestamps();
       manageTypes(table, json);
     }).catch(function(e) {
       // TODO JLL : could be better to synchronize the createTable to avoid the catch exception
