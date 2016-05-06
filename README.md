@@ -58,6 +58,7 @@ POST /persons HTTP/1.1
 
 {
   "title": "second title",
+  "firstName": "nahoj",
   "age": 35,
   "isBeautiful": true
 }
@@ -74,8 +75,7 @@ select * from persons;
 | _id | title | firstName | lastName | town | state | age | isBeautiful |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California |
-| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | | | | | 35 | 1 |
-
+| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 |
 
 ### Nested property
 ```http
@@ -84,8 +84,8 @@ POST /persons HTTP/1.1
 {
   "title": "third one",
   "nested": {
-    "label": "aSentence",
-    "date": "2016-05-06T15:28:13",
+    "label": "a sentence",
+    "date": "2016-05-06T15:28:13Z",
     "zipCode": 23456
   }
 }
@@ -94,6 +94,15 @@ Should alter the table `persons` and add a new column `nested`.
 ```sql
 alter table `persons` add `nested` varchar(255);
 ```
+Should create a nested table `persons_nested`.
+```sql
+select * from persons_nested;
+```
+
+| _id | label | date | zipCode |
+|----------|----------|-----------|----------|
+| 0c292041-47db-43f8-8106-da00652e9260 | a sentence | 2016-05-06T15:28:13Z | 23456 |
+
 Should insert a record into this table.
 ```sql
 select * from persons;
@@ -102,17 +111,38 @@ select * from persons;
 | _id | title | firstName | lastName | town | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
-| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | | | | | 35 | 1 | |
+| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | third one | | | | | | | 0c292041-47db-43f8-8106-da00652e9260 |
-
 
 ### Multi-valued property
 ```json
 {
-  "title": "",
+  "title": "I have a multi valued property",
+  "firstName": "jll",
   "multi": [
-    {"title": "myTitle", "flag": false},
-    {"title": "anotherTitle", "flag": true}
+    {"title": "my title", "flag": false},
+    {"title": "another title", "flag": true}
   ]
 }
 ```
+Should create a new table `persons_multi` which contain the values of `multi` property.
+```sql
+select * from persons_multi;
+```
+
+| _id | _fid | title | flag |
+|----------|----------|-----------|----------|
+| 96393e06-3739-42f4-a598-461646173a06 | 85aa59a8-0411-4275-8f8d-f5d30c0891f4 | my title | 0 |
+| 8200aa4d-15a1-4f84-822a-b68d2d224675 | 85aa59a8-0411-4275-8f8d-f5d30c0891f4 | another title | 1 |
+
+Should insert a record into this table.
+```sql
+select * from persons;
+```
+
+| _id | title | firstName | lastName | town | state | age | isBeautiful | nested |
+|----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
+| ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
+| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
+| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | third one | | | | | | | 0c292041-47db-43f8-8106-da00652e9260 |
+| 85aa59a8-0411-4275-8f8d-f5d30c0891f4 | I have a multi valued property | jll | | | | | | |
