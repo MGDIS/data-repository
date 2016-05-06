@@ -1,11 +1,15 @@
 {
   "name": "data-repository",
   "version": "0.0.1",
-  "description": "Saves JSON object into relational database for reporting",
+  "description": "Saves JSON object from HTTP POST request into relational database for reporting",
   "main": "server.js",
   "scripts": {
     "test": "mocha -t 20000 test/**/*.js",
     "cibuild": "./node_modules/.bin/istanbul cover --dir=build/coverage _mocha test/**/*.js -- -t 20000 -R xunit-file; mkdir build/report; mv xunit.xml build/report/TESTS-xunit.xml"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MGDIS/data-repository.git"
   },
   "keywords": [
     "data-repository",
@@ -13,26 +17,27 @@
     "reporting",
     "BI"
   ],
-  "author": " <Johan Le Lan>",
+  "author": "Johan Le Lan <lelan-j@mgdis.fr>",
   "license": "ISC",
+  "engine": "node >= 0.4.1",
   "dependencies": {
     "body-parser": "^1.15.0",
-    "cibuild-utils": "^0.2.1",
     "config": "^1.20.1",
     "cors": "^2.7.1",
     "express": "^4.13.4",
-    "istanbul": "^0.4.3",
     "knex": "^0.10.0",
     "lodash": "^4.11.2",
     "node-uuid": "^1.4.7",
     "when": "^3.7.7",
-    "winston": "^2.2.0",
-    "xunit-file": "0.0.9"
+    "winston": "^2.2.0"
   },
   "devDependencies": {
+    "cibuild-utils": "^0.2.1",
+    "istanbul": "^0.4.3",
     "mocha": "^2.4.5",
     "request": "^2.72.0",
     "should": "^8.3.1",
-    "sqlite3": "^3.1.3"
+    "sqlite3": "^3.1.3",
+    "xunit-file": "0.0.9"
   }
 }
