@@ -13,6 +13,8 @@ var fs = require('fs');
 var app = require('../src/app');
 var logger = winston.loggers.get('data-repository-test');
 var db = undefined;
+var tableIdentifierColumnName = config.constants.tableIdentifierColumnName;
+var foreignColumnName = config.constants.foreignColumnName;
 
 /**
  * Start the service to invoke HTTP requests
@@ -313,7 +315,7 @@ it('Should manage nested property', function(done) {
                   db.select().from(nestedTable).then(function (nestedResults) {
                     nestedResults.should.be.an.array;
                     nestedResults.length.should.be.greaterThan(0);
-                    nestedResults[nestedResults.length - 1].should.have.property('_id', results[results.length -1][nested]);
+                    nestedResults[nestedResults.length - 1].should.have.property(tableIdentifierColumnName, results[results.length -1][nested]);
                     nestedResults[nestedResults.length - 1].should.have.property('key', object['key']);
                     nestedResults[nestedResults.length - 1].should.have.property('key2', object['key2']);
                     nestedResults[nestedResults.length - 1].should.have.property('key3', 1/*object['key3']*/);
@@ -397,7 +399,6 @@ it('Should manage multi-valued property', function(done) {
 });
 
 it('Should manage real world JSON', function(done) {
-  this.timeout(5000);
   var table = 'reals';
   var tags = table + '_tags';
   var friends = table + '_friends';
@@ -422,9 +423,9 @@ it('Should manage real world JSON', function(done) {
         db.select().from(table).then(function(results) {
           results.should.be.an.array;
           results.should.have.length(1);
-          results[0].should.have.property('_id');
+          results[0].should.have.property(tableIdentifierColumnName);
           results[0].should.have.property('address');
-          rowId = results[0]['_id'];
+          rowId = results[0][tableIdentifierColumnName];
           addressId = results[0]['address'];
         });
       }
@@ -435,13 +436,13 @@ it('Should manage real world JSON', function(done) {
         db.select().from(addresses).then(function(results) {
           results.should.be.an.array;
           results.should.have.length(1);
-          results[0].should.have.property('_id', addressId);
+          results[0].should.have.property(tableIdentifierColumnName, addressId);
           results[0].should.have.property('number', 527);
           results[0].should.have.property('street', 'Florence Avenue');
           results[0].should.have.property('city', 'Trona');
           results[0].should.have.property('state', 'California');
           results[0].should.have.property('zipcode', 6149);
-          results[0].should.not.have.property('_fid');
+          results[0].should.not.have.property(foreignColumnName);
         });
       }
     })).then(db.select().from(tags).then(function (exists) {
@@ -451,20 +452,20 @@ it('Should manage real world JSON', function(done) {
         db.select().from(tags).then(function(results) {
           results.should.be.an.array;
           results.should.have.length(7);
-          results[0].should.have.property('value', 'ad');
-          results[0].should.have.property('_fid', rowId);
-          results[1].should.have.property('value', 'nostrud');
-          results[1].should.have.property('_fid', rowId);
-          results[2].should.have.property('value', 'excepteur');
-          results[2].should.have.property('_fid', rowId);
-          results[3].should.have.property('value', 'commodo');
-          results[3].should.have.property('_fid', rowId);
-          results[4].should.have.property('value', 'ex');
-          results[4].should.have.property('_fid', rowId);
-          results[5].should.have.property('value', 'cillum');
-          results[5].should.have.property('_fid', rowId);
-          results[6].should.have.property('value', 'ullamco');
-          results[6].should.have.property('_fid', rowId);
+          results[0].should.have.property('tags', 'ad');
+          results[0].should.have.property(foreignColumnName, rowId);
+          results[1].should.have.property('tags', 'nostrud');
+          results[1].should.have.property(foreignColumnName, rowId);
+          results[2].should.have.property('tags', 'excepteur');
+          results[2].should.have.property(foreignColumnName, rowId);
+          results[3].should.have.property('tags', 'commodo');
+          results[3].should.have.property(foreignColumnName, rowId);
+          results[4].should.have.property('tags', 'ex');
+          results[4].should.have.property(foreignColumnName, rowId);
+          results[5].should.have.property('tags', 'cillum');
+          results[5].should.have.property(foreignColumnName, rowId);
+          results[6].should.have.property('tags', 'ullamco');
+          results[6].should.have.property(foreignColumnName, rowId);
         });
       }
     })).then(db.select().from(friends).then(function (exists) {
@@ -476,13 +477,13 @@ it('Should manage real world JSON', function(done) {
           results.should.have.length(3);
           results[0].should.have.property('id', 0);
           results[0].should.have.property('name', 'Shana Riggs');
-          results[0].should.have.property('_fid', rowId);
+          results[0].should.have.property(foreignColumnName, rowId);
           results[1].should.have.property('id', 1);
           results[1].should.have.property('name', 'Luna Brennan');
-          results[1].should.have.property('_fid', rowId);
+          results[1].should.have.property(foreignColumnName, rowId);
           results[2].should.have.property('id', 2);
           results[2].should.have.property('name', 'Gray Berry');
-          results[2].should.have.property('_fid', rowId);
+          results[2].should.have.property(foreignColumnName, rowId);
           done();
         });
       }

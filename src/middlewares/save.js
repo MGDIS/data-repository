@@ -3,12 +3,22 @@ var uuid = require('node-uuid');
 var path = require('path');
 var when = require('when');
 var _ = require('lodash');
+var config = require('config');
 
 var error = require('../utils/error');
 
 var serviceName = 'data-repository';
 var logger = winston.loggers.get(serviceName);
-var columnIdentifier = '_id';
+var tableIdentifierColumnName = config.constants.tableIdentifierColumnName;
+var foreignColumnName = config.constants.foreignColumnName;
+
+function generateRowId(json) {
+  // generate technical identifier
+  json[tableIdentifierColumnName] = json[tableIdentifierColumnName]
+  if (json[tableIdentifierColumnName] === undefined) {
+    json[tableIdentifierColumnName] = uuid.v4();
+  }
+}
 
 /**
  * Save into database the json object.
@@ -21,14 +31,56 @@ var columnIdentifier = '_id';
  */
 function toDatabase(db, tableName, json) {
 
+  function manageObjectProperties(table, object, key, value) {
+    // two cases. It's an array or a map
+    var isArray = Array.isArray(value);
+    // create or alter the table named table+"_"+key
+    var objectNameTable = tableName + '_' + key;
+    if(isArray) {
+      // it's an array
+      var values = value;
+      generateRowId(json);
+      // remove this array from json
+      delete json[key];
+      if (values.length > 0) {
+        when.map(values, function(val) {
+          // another two cases. It's an object or primitive type values
+          if (typeof val !== 'object') {
+            // array of primitive type
+            var newVal = {};
+            newVal[key] = val;
+            val = newVal;
+          }
+          // modify each array values with current row identifier
+          val[foreignColumnName] = json[tableIdentifierColumnName];
+          toDatabase(db, objectNameTable, val);
+        });
+      }
+    } else {
+      // it's a map
+      // generate a foreign key
+      generateRowId(value);
+      // prepare current table with a string key (should contain the new foreign key)
+      table.string(key);
+      // set the foreign key to current json
+      json[key] = value[tableIdentifierColumnName];
+      // create the nested table and insert the modified nested object
+      toDatabase(db, objectNameTable, value);
+    }
+  }
+
   /**
    * map every object properties to a table column.
    * generate alter table with add column if table already exists
    * @param table{object} : KnexJS table object
    * @param object{object} : could be plain old JSON (on createTable) or only newly properties (on alterTable)
    */
-  function manageTypes(table, object) {
+  function manageTypes(table, object, skipId) {
     Object.keys(object).forEach(function (key) {
+      // skip key if it equals tableIdentifierColumnName
+      if (skipId && key === tableIdentifierColumnName) {
+        return;
+      }
       var value = object[key];
       var type = typeof value;
       switch (type) {
@@ -42,38 +94,7 @@ function toDatabase(db, tableName, json) {
           table.integer(key);
           break;
         case 'object':
-          var isArray = Array.isArray(value);
-          var values = value;
-          // create or alter the table named table+"_"+key
-          var objectNameTable = tableName + '_' + key;
-          if(isArray) {
-            // generate current row identifier
-            json[columnIdentifier] = json[columnIdentifier] || uuid.v4();
-            // remove this array from json
-            delete json[key];
-            if (values.length > 0) {
-              when.map(values, function(val) {
-                if (typeof val !== 'object') {
-                  // array of primitive type
-                  val = {value: val};
-                }
-                // modify each array values with current row identifier
-                val._fid = json[columnIdentifier];
-                toDatabase(db, objectNameTable, val);
-              });
-            }
-          } else {
-            // generate a foreign key
-            var id = uuid.v4();
-            // prepare current table with a string key (should contain the new foreign key)
-            table.string(key);
-            // set the foreign key to current json
-            json[key] = id;
-            // need to force the nested id object
-            value[columnIdentifier] = id;
-            // create the nested table and insert the modified nested object
-            toDatabase(db, objectNameTable, value);
-          }
+          manageObjectProperties(table, object, key, value);
           break;
         default:
           table.string(key);
@@ -89,13 +110,17 @@ function toDatabase(db, tableName, json) {
    */
   function createTableSchema() {
     return db.schema.createTable(tableName, function (table) {
-      // generate technical identifier
-      json[columnIdentifier] = json[columnIdentifier] || uuid.v4();
+      // add table technical identifier column
+      var skipId = true;
+      if (json[tableIdentifierColumnName] !== undefined) {
+        skipId = false;
+      } else {
+        table.string(tableIdentifierColumnName);
+      }
       table.timestamps();
-      manageTypes(table, json);
+      manageTypes(table, json, skipId);
     }).catch(function(e) {
       // TODO JLL : could be better to synchronize the createTable to avoid the catch exception
-      logger.warn('When creating table', e);
       alterTableSchema();
     });
   }
@@ -120,8 +145,7 @@ function toDatabase(db, tableName, json) {
    * @returns {*}
    */
   function saveIntoDatabase() {
-    // generate technical identifier
-    json[columnIdentifier] = json[columnIdentifier] || uuid.v4();
+    generateRowId(json);
     return db.insert([json]).into(tableName);
   }
 

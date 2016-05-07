@@ -13,6 +13,10 @@ module.exports = {
     },
     useNullAsDefault: true
   },
+  constants: {
+    tableIdentifierColumnName: 'id',
+    foreignColumnName: 'foreignId'
+  },
   log: {
     options: {
       transports: {

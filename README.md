@@ -2,20 +2,40 @@
 
 A simple service that save JSON object from HTTP request into SQL92 relational databases.
 
+## Resume
+
+Based on the flexible SQL query builder [Knexjs](https://github.com/tgriesser/knex),
+this [ExpressJS](http://expressjs.com/) service saves every JSON object into SQL92 relational databases.
+It supports MySQL, PostgreSQL, Sqlite3 and Oracle.
+
 ## Installation
 
+First you need to **clone this repository**.
+Then you must install the service's dependencies.
 ```sh
+git clone https://github.com/MGDIS/data-repository.git
+cd data-repository
 npm install
 ```
 
-## Resume
+## Test
 
-Based on the flexible SQL query builder [Knexjs](https://github.com/tgriesser/knex), this [ExpressJS](http://expressjs.com/) service save every JSON object into SQL92 relational databases. It supports MySQL, PostgreSQL, Sqlite3 and Oracle.
+This service comes with a mocha test suite. Run tests with this command :
+```sh
+npm test
+```
+
+### Coverage and code analysis
+
+If you want a report on code statistics, feel free to run `cibuild` command :
+```sh
+npm run-script cibuild
+```
 
 ## Basic rules
 
 It will save JSON's map to named table and array to external table with foreign keys. 
-It suports alter table when a new property is detected in existing table. 
+It supports alter table when a new property is detected in existing table.
 **It does not support dropping property from existing table**
 
 ### Plain old JSON
@@ -26,7 +46,7 @@ POST /persons HTTP/1.1
   "title": "my title",
   "firstName": "Johan",
   "lastName": "LE LAN",
-  "town": "San Francisco",
+  "city": "San Francisco",
   "state": "California"
 }
 ```
@@ -37,7 +57,7 @@ create table `persons` (
   `title` varchar(255), 
   `firstName` varchar(255), 
   `lastName` varchar(255), 
-  `town` varchar(255), 
+  `city` varchar(255), 
   `state` varchar(255), 
   `created_at` datetime, 
   `updated_at` datetime
@@ -48,7 +68,7 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | town | state |
+| _id | title | firstName | lastName | city | state |
 |----------|----------|-----------|----------|---------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California |
 
@@ -72,7 +92,7 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | town | state | age | isBeautiful |
+| _id | title | firstName | lastName | city | state | age | isBeautiful |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 |
@@ -119,14 +139,16 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | town | state | age | isBeautiful | nested |
+| _id | title | firstName | lastName | city | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | third one | | | | | | | **0c292041-47db-43f8-8106-da00652e9260** |
 
 ### Multi-valued property
-```json
+```http
+POST /persons HTTP/1.1
+
 {
   "title": "I have a multi valued property",
   "firstName": "jll",
@@ -162,7 +184,7 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | town | state | age | isBeautiful | nested |
+| _id | title | firstName | lastName | city | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
