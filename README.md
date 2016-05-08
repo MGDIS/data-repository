@@ -44,7 +44,7 @@ Content-Type: application/json
   ...
 }
 ```
-> NOTE : kind will be use to create the table (if needed)
+> NOTE : kind will be use as table name
 
 ## JSON to SQL
 
