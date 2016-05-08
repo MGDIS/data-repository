@@ -32,13 +32,29 @@ If you want a report on code statistics, feel free to run `cibuild` command :
 npm run-script cibuild
 ```
 
-## Basic rules
+## WEB API
+This service expose only one endpoint `POST on /{kind}`.
+
+```http
+POST /{kind} HTTP/1.1
+Content-Type: application/json
+
+{
+  // Your plain old JSON
+  ...
+}
+```
+> NOTE : kind will be use to create the table (if needed)
+
+## JSON to SQL
 
 It will save JSON's map to named table and array to external table with foreign keys. 
 It supports alter table when a new property is detected in existing table.
 **It does not support dropping property from existing table**
 
-### Plain old JSON
+### Basic rules
+
+#### Plain old JSON
 ```http
 POST /persons HTTP/1.1
 
@@ -53,7 +69,7 @@ POST /persons HTTP/1.1
 Should create a new table named `persons`.
 ```sql
 create table `persons` (
-  `_id` varchar(255) not null primary key, 
+  `id` varchar(255) not null primary key, 
   `title` varchar(255), 
   `firstName` varchar(255), 
   `lastName` varchar(255), 
@@ -68,11 +84,11 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | city | state |
+| id | title | firstName | lastName | city | state |
 |----------|----------|-----------|----------|---------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California |
 
-### Additional properties
+#### Additional properties
 ```http
 POST /persons HTTP/1.1
 
@@ -92,7 +108,7 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | city | state | age | isBeautiful |
+| id | title | firstName | lastName | city | state | age | isBeautiful |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 |
@@ -117,7 +133,7 @@ alter table `persons` add `nested` varchar(255);
 Should create a nested table `persons_nested`.
 ```sql
 create table `persons_nested` (
-  `_id` varchar(255) not null primary key, 
+  `id` varchar(255) not null primary key, 
   `label` varchar(255), 
   `date` varchar(255), 
   `zipCode` varchar(255),
@@ -130,7 +146,7 @@ This new table should contain a record.
 select * from persons_nested;
 ```
 
-| _id | label | date | zipCode |
+| id | label | date | zipCode |
 |----------|----------|-----------|----------|
 | **0c292041-47db-43f8-8106-da00652e9260** | a sentence | 2016-05-06T15:28:13Z | 23456 |
 
@@ -139,42 +155,45 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | city | state | age | isBeautiful | nested |
+| id | title | firstName | lastName | city | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
-| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | third one | | | | | | | **0c292041-47db-43f8-8106-da00652e9260** |
+| da89687d-9304-4934-845f-8ea36bd420be | third one | | | | | | | **0c292041-47db-43f8-8106-da00652e9260** |
 
-### Multi-valued property
+#### Multi-valued property
+Two cases will be covered by this behavior. First a property multi-valued with nested objects. Second a multi-valued property with primive types.
+
+##### Multi-valued objects property
 ```http
 POST /persons HTTP/1.1
 
 {
-  "title": "I have a multi valued property",
+  "title": "I have a many friends",
   "firstName": "jll",
-  "multi": [
+  "friends": [
     {"title": "my title", "flag": false},
     {"title": "another title", "flag": true}
   ]
 }
 ```
-Should create a new table `persons_multi` which contain the values of `multi` property.
+Should create a new table `persons_friends` which contain the values of `friends` property.
 ```sql
-create table `persons_multi` (
-  `_id` varchar(255) not null primary key, 
-  `_fid` varchar(255) FOREIGN KEY REFERENCES persons(_id), 
+create table `persons_friends` (
+  `id` varchar(255) not null primary key, 
+  `foreignId` varchar(255) FOREIGN KEY REFERENCES persons(id), 
   `title` varchar(255), 
   `flag` varchar(255), 
   `created_at` datetime, 
   `updated_at` datetime
 );
 ```
-This new table should contain all the values of `multi` property.
+This new table should contain all the values of `friends` property.
 ```sql
-select * from persons_multi;
+select * from persons_friends;
 ```
 
-| _id | _fid | title | flag |
+| id | foreignId | title | flag |
 |----------|----------|-----------|----------|
 | 96393e06-3739-42f4-a598-461646173a06 | **85aa59a8-0411-4275-8f8d-f5d30c0891f4** | my title | 0 |
 | 8200aa4d-15a1-4f84-822a-b68d2d224675 | **85aa59a8-0411-4275-8f8d-f5d30c0891f4** | another title | 1 |
@@ -184,9 +203,56 @@ Should insert a record into this table.
 select * from persons;
 ```
 
-| _id | title | firstName | lastName | city | state | age | isBeautiful | nested |
+| id | title | firstName | lastName | city | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
 | ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
-| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | third one | | | | | | | 0c292041-47db-43f8-8106-da00652e9260 |
-| **85aa59a8-0411-4275-8f8d-f5d30c0891f4** | I have a multi valued property | jll | | | | | | |
+| da89687d-9304-4934-845f-8ea36bd420be | third one | | | | | | | 0c292041-47db-43f8-8106-da00652e9260 |
+| **85aa59a8-0411-4275-8f8d-f5d30c0891f4** | I have many friends | jll | | | | | | |
+
+##### Multi primitive values property
+Imagine that your JSON contains a property with something like : 
+```json
+{
+  "title": "primitive array",
+  "tags": [
+    "wonderful",
+    "great"
+  ]
+}
+```
+In this case, the service will create a table named `persons_tags` with : 
+ - an `id` column
+ - a `foreignId` column
+ - a `tags` column
+
+```sql
+create table `persons_tags` (
+  `id` varchar(255) not null primary key, 
+  `foreignId` varchar(255) FOREIGN KEY REFERENCES persons(id), 
+  `tags` varchar(255), 
+  `created_at` datetime, 
+  `updated_at` datetime
+);
+```
+ 
+This new table will contain two records:
+```sql
+select * from persons_tags;
+```
+
+| id | foreignId | tags |
+|----------|----------|-----------|
+| 81b66637-3072-446e-ab3f-65d5f0e4adf6 | **c2a7e3bf-de6f-4147-9926-aa482f28e72c** | wonderful |
+| fb2bb8da-4f84-4843-9c84-f7836296a9c1 | **c2a7e3bf-de6f-4147-9926-aa482f28e72c** | great |
+
+```sql
+select * from persons;
+```
+
+| id | title | firstName | lastName | city | state | age | isBeautiful | nested |
+|----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
+| ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
+| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
+| da89687d-9304-4934-845f-8ea36bd420be | third one | | | | | | | 0c292041-47db-43f8-8106-da00652e9260 |
+| **c2a7e3bf-de6f-4147-9926-aa482f28e72c** | primitive array | | | | | | | |
