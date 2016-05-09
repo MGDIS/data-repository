@@ -20,6 +20,47 @@ npm install
 
 You can configure the database connection settings in `config/default.js`. For testing purpose, the default connection is a [SQLite3](https://www.sqlite.org). But you are able to change it. Follow [Knexjs client configuration](http://knexjs.org/#Installation-client) for more details.
 
+Examples
+- Oracle
+```json
+db: {
+  client: 'oracle',
+  connection: {
+    user: 'username',
+    password: 'pass',
+    host: 'path.to.some-url',
+    port: '1521',
+    database: 'testdb'
+  }
+}
+```
+- MSSQL
+```json
+db: {
+  client: 'mssql',
+  connection: {
+    user: 'username',
+    password: 'pass',
+    server: 'path.to.some-url',
+    port: '1433',
+    database: 'testdb'
+  }
+}
+```
+- PostgreSQL
+```json
+db: {
+  client: 'postgres',
+  connection: {
+    user: 'username',
+    password: 'pass',
+    host: 'path.to.some-url',
+    port: '5432',
+    database: 'testdb'
+  }
+}
+```
+
 ## Test
 
 This service comes with a mocha test suite. Run tests with this command :
