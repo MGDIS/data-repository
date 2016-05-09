@@ -4,9 +4,7 @@ A simple service that saves JSON object from HTTP to SQL92 relational databases.
 
 ## Resume
 
-Based on the flexible SQL query builder [Knexjs](https://github.com/tgriesser/knex),
-this [ExpressJS](http://expressjs.com/) service saves every JSON object into SQL92 relational databases.
-It supports MySQL, PostgreSQL, Sqlite3 and Oracle.
+Based on [Knexjs](https://github.com/tgriesser/knex) and [ExpressJS](http://expressjs.com/), this service saves `every` JSON object into SQL92 relational databases. It supports MySQL, PostgreSQL, Sqlite3 and Oracle.
 
 ## Installation
 
