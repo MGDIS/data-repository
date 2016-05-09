@@ -153,7 +153,6 @@ select * from persons;
 
 | id | title | firstName | lastName | city | state | age | isBeautiful |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|
-| ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California |
 | bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 |
 
 ### Nested property
@@ -200,8 +199,6 @@ select * from persons;
 
 | id | title | firstName | lastName | city | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
-| ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
-| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
 | da89687d-9304-4934-845f-8ea36bd420be | third one | | | | | | | **0c292041-47db-43f8-8106-da00652e9260** |
 
 #### Multi-valued property
@@ -248,9 +245,6 @@ select * from persons;
 
 | id | title | firstName | lastName | city | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
-| ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
-| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
-| da89687d-9304-4934-845f-8ea36bd420be | third one | | | | | | | 0c292041-47db-43f8-8106-da00652e9260 |
 | **85aa59a8-0411-4275-8f8d-f5d30c0891f4** | I have many friends | jll | | | | | | |
 
 ##### Multi primitive values property
@@ -295,7 +289,4 @@ select * from persons;
 
 | id | title | firstName | lastName | city | state | age | isBeautiful | nested |
 |----------|----------|-----------|----------|---------------|------------|------------|------------|------------|
-| ef1baa16-7d8c-4a06-94b5-7263d6472a4e | my title | Johan | LE LAN | San Francisco | California | | | | |
-| bb0dc044-fbf1-426b-a05a-fbd2af72c7e5 | second title | nahoj | | | | 35 | 1 | |
-| da89687d-9304-4934-845f-8ea36bd420be | third one | | | | | | | 0c292041-47db-43f8-8106-da00652e9260 |
 | **c2a7e3bf-de6f-4147-9926-aa482f28e72c** | primitive array | | | | | | | |
