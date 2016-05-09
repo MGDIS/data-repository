@@ -4,7 +4,7 @@ A simple service that saves JSON object from HTTP to SQL92 relational databases.
 
 ## Resume
 
-Based on [Knexjs](https://github.com/tgriesser/knex) and [ExpressJS](http://expressjs.com/), this service saves `every` JSON object into SQL92 relational databases. It supports MySQL, PostgreSQL, Sqlite3 and Oracle.
+Based on [Knexjs](https://github.com/tgriesser/knex) and [ExpressJS](http://expressjs.com/), this service saves `every` JSON object into SQL92 relational databases. It supports MySQL, PostgreSQL, Sqlite3, MSSQL and Oracle.
 
 ## Installation
 
@@ -15,6 +15,10 @@ git clone https://github.com/MGDIS/data-repository.git
 cd data-repository
 npm install
 ```
+
+## Configure
+
+You can configure the database connection settings in `config/default.js`. For testing purpose, the default connection is a [SQLite3](https://www.sqlite.org). But you are able to change it. Follow [Knexjs client configuration](http://knexjs.org/#Installation-client) for more details.
 
 ## Test
 
