@@ -22,7 +22,7 @@ You can configure the database connection settings in `config/default.js`. For t
 
 Examples
 - Oracle
-```json
+```javascript
 db: {
   client: 'oracle',
   connection: {
@@ -35,7 +35,7 @@ db: {
 }
 ```
 - MSSQL
-```json
+```javascript
 db: {
   client: 'mssql',
   connection: {
@@ -48,7 +48,7 @@ db: {
 }
 ```
 - PostgreSQL
-```json
+```javascript
 db: {
   client: 'postgres',
   connection: {
