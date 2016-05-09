@@ -1,6 +1,6 @@
 # DATA REPOSITORY
 
-A simple service that save JSON object from HTTP request into SQL92 relational databases.
+A simple service that saves JSON object from HTTP to SQL92 relational databases.
 
 ## Resume
 
