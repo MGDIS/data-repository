@@ -83,8 +83,8 @@ POST /{kind} HTTP/1.1
 Content-Type: application/json
 
 {
-  // Your plain old JSON
-  ...
+  "what":"ever",
+  "json": "you want!"
 }
 ```
 > NOTE : kind will be use as table name
