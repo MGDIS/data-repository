@@ -1,3 +1,6 @@
+### Status
+[![Build Status](https://travis-ci.org/MGDIS/data-repository.svg?branch=master)](https://travis-ci.org/MGDIS/data-repository)
+
 # DATA REPOSITORY
 
 A simple service that saves JSON object from HTTP to SQL92 relational databases.
@@ -33,7 +36,6 @@ npm run-script cibuild
 ## Documentation
 
 Available documentation is in the [wiki](https://github.com/MGDIS/data-repository/wiki).
-
 
 ## JSON to SQL
 
