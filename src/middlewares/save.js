@@ -1,5 +1,5 @@
 var winston = require('winston');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 var path = require('path');
 var when = require('when');
 var _ = require('lodash');
@@ -16,7 +16,7 @@ function generateRowId(json) {
   // generate technical identifier
   json[tableIdentifierColumnName] = json[tableIdentifierColumnName]
   if (json[tableIdentifierColumnName] === undefined) {
-    json[tableIdentifierColumnName] = uuid.v4();
+    json[tableIdentifierColumnName] = uuid();
   }
 }
 
