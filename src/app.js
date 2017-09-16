@@ -17,7 +17,7 @@ app.use(bodyParser.json({ strict: false }));
 function runApp(callback) {
   // SQL driver
   var db = Knex(config.db);
-  
+  console.log('connection to DB: ', !db, config.db);
   app.listen(config.APP_PORT, function (err) {
     logger.info('Starting %s', config.serviceName);
     if (err) {

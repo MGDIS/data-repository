@@ -1,0 +1,25 @@
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    links:
+      - db
+    environment:
+      - DB_CLIENT=mysql
+      - DB_CONNECTION=mysql://data-repository:data-repository@db:3306/data-repository
+  db:
+    image: mysql
+    container_name: db
+    environment: 
+     - "MYSQL_USER=data-repository"
+     - "MYSQL_PASSWORD=data-repository"
+     - "MYSQL_ROOT_PASSWORD=data-repository"
+     - "MYSQL_DATABASE=data-repository"
+    ports:
+      - "3306:3306"
+  admindb:
+    image: adminer
+    ports:
+     - 8080:8080
+    links: 
+     - db

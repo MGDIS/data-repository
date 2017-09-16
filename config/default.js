@@ -1,5 +1,5 @@
 module.exports = {
-  APP_PORT: process.env.APP_PORT || 3002,
+  APP_PORT: process.env.APP_PORT || 3000,
   serviceName: 'data-repository',
   expositionPath: process.env.EXPOSITION_PATH || '/',
   admin: {
@@ -7,8 +7,8 @@ module.exports = {
     password: (process.env.ADMIN_PASSWORD || 'admin')
   },
   db : {
-    client: 'sqlite3',
-    connection: {
+    client: process.env.DB_CLIENT || 'sqlite3',
+    connection: process.env.DB_CONNECTION || {
       filename: './data-repository.sqlite'
     },
     useNullAsDefault: true
