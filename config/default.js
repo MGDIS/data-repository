@@ -17,6 +17,7 @@ module.exports = {
     tableIdentifierColumnName: process.env.COLUMN_ID_NAME || '_id',
     foreignColumnName: process.env.COLUMN_FOREIGN_ID_NAME || '_foreignId'
   },
+  shortenColumnNames: process.env.SHORTEN_COLUMN_NAMES || false,
   log: {
     options: {
       transports: {

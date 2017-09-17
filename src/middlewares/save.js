@@ -36,6 +36,13 @@ function toDatabase(db, tableName, json) {
     var isArray = Array.isArray(value);
     // create or alter the table named table+"_"+key
     var objectNameTable = tableName + '_' + key;
+    if (config.shortenColumnNames === 'true' || config.shortenColumnNames === true) {
+      const paths = objectNameTable.split('_');
+      paths = paths.map(function(p) {
+        return p.substring(0, p.length > 3 ? 3 : p.length);
+      });
+      objectNameTable = paths.join('');
+    }
     if(isArray) {
       // it's an array
       var values = value;
