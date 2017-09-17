@@ -57,8 +57,10 @@ function toDatabase(db, tableName, json) {
           }
           // modify each array values with current row identifier
           val[foreignColumnName] = json[tableIdentifierColumnName];
-          toDatabase(db, objectNameTable, val);
+          return toDatabase(db, objectNameTable, val);
         });
+      } else {
+        return toDatabase(db, objectNameTable, undefined);
       }
     } else {
       // it's a map
@@ -69,7 +71,7 @@ function toDatabase(db, tableName, json) {
       // set the foreign key to current json
       json[key] = value[tableIdentifierColumnName];
       // create the nested table and insert the modified nested object
-      toDatabase(db, objectNameTable, value);
+      return toDatabase(db, objectNameTable, value);
     }
   }
 
@@ -80,6 +82,7 @@ function toDatabase(db, tableName, json) {
    * @param object{object} : could be plain old JSON (on createTable) or only newly properties (on alterTable)
    */
   function manageTypes(table, object, skipId) {
+    if (!object) return;
     Object.keys(object).forEach(function (key) {
       // skip key if it equals tableIdentifierColumnName
       if (skipId && key === tableIdentifierColumnName) {
@@ -116,13 +119,13 @@ function toDatabase(db, tableName, json) {
     return db.schema.createTable(tableName, function (table) {
       // add table technical identifier column
       var skipId = true;
-      if (json[tableIdentifierColumnName] !== undefined) {
+      if (json && json[tableIdentifierColumnName] !== undefined) {
         skipId = false;
       } else {
         table.string(tableIdentifierColumnName);
       }
       table.timestamps();
-      manageTypes(table, json, skipId);
+      return manageTypes(table, json, skipId);
     }).catch(function(e) {
       // TODO JLL : could be better to synchronize the createTable to avoid the catch exception
       return alterTableSchema();
@@ -157,7 +160,7 @@ function toDatabase(db, tableName, json) {
   return db.schema.hasTable(tableName).then(function(exists) {
     // if not exist then create the table (from incoming JSON)
     var manageTable = exists ? alterTableSchema() : createTableSchema();
-    return manageTable.then(saveIntoDatabase);
+    return json ? manageTable.then(saveIntoDatabase) : manageTable;
   });
 }
 

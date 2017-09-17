@@ -494,3 +494,87 @@ it('Should manage real world JSON', function(done) {
     }, 1000);
   });
 });
+
+it('Should manage empty array values', function(done) {
+  var table = 'empty-array';
+  var conformiteTable = 'empty-array_conformite';
+  var conformiteMotifsTable = 'empty-array_conformite_motifs';
+  request({
+    method: 'POST',
+    url: 'http://localhost:' + app.port + '/' + table,
+    json: {
+      "id": "my-empty-array",
+      "conformite" : {
+        "value" : true,
+        "motifs" : []
+      }
+    }
+  }, function(err, response) {
+    response.should.be.an.object;
+    response.should.have.property('statusCode', 201);
+    response.should.have.property('body');
+    response.body.should.be.an.object;
+    response.body.should.have.property('saved', true);
+    // check if table test exists
+    var rowId = undefined;
+    var conformiteId = undefined;
+    setTimeout(function() {
+      db.schema.hasTable(table).then(function (exists) {
+        if (!exists) {
+          done('Table ' + table + ' should exist');
+        } else {
+          db.select().from(table).then(function(results) {
+            results.should.be.an.array;
+            results.should.have.length(1);
+            results[0].should.have.property(tableIdentifierColumnName);
+            results[0].should.have.property('conformite');
+            rowId = results[0][tableIdentifierColumnName];
+            conformiteId = results[0]['conformite'];
+          });
+        }
+      }).then(db.select().from(conformiteTable).then(function (exists) {
+        if (!exists) {
+          done('Table ' + conformiteTable + ' should exist');
+        } else {
+          db.select().from(conformiteTable).then(function(results) {
+            results.should.be.an.array;
+            results.should.have.length(1);
+            results[0].should.have.property(tableIdentifierColumnName, conformiteId);
+            results[0].should.have.property('value', 1);
+            results[0].should.not.have.property(foreignColumnName);
+          });
+        }
+      })).then(db.select().from(conformiteMotifsTable).then(function (exists) {
+        if (!exists) {
+          done('Table ' + conformiteMotifsTable + ' should exist');
+        } else {
+          db.select().from(conformiteMotifsTable).then(function(results) {
+            results.should.be.an.array;
+            results.should.have.length(0);
+            done();
+          });
+        }
+      }));
+    }, 1000);
+  });
+});
+
+it.skip('For testing purpose', function(done) {
+  request({
+    method: 'POST',
+    url: 'http://localhost:' + app.port + '/demandes-financement',
+    json: require('./resources/test')
+  }, function(err, response) {
+    response.should.be.an.object;
+    response.should.have.property('statusCode', 201);
+    response.should.have.property('body');
+    response.body.should.be.an.object;
+    response.body.should.have.property('saved', true);
+    // check if table test exists
+    var rowId = undefined;
+    var conformiteId = undefined;
+    setTimeout(function() {
+      done();
+    }, 1000);
+  });
+});
