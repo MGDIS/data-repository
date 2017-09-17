@@ -37,11 +37,7 @@ function toDatabase(db, tableName, json) {
     // create or alter the table named table+"_"+key
     var objectNameTable = tableName + '_' + key;
     if (config.shortenColumnNames === 'true' || config.shortenColumnNames === true) {
-      let paths = objectNameTable.split('_');
-      paths = paths.map(function(p) {
-        return p.substring(0, p.length > 3 ? 3 : p.length);
-      });
-      objectNameTable = paths.join('');
+      objectNameTable = tableName + key.substring(0, key.length > 3 ? 3 : key.length);
     }
     if(isArray) {
       // it's an array
