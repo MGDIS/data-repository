@@ -14,8 +14,8 @@ module.exports = {
     useNullAsDefault: true
   },
   constants: {
-    tableIdentifierColumnName: 'id',
-    foreignColumnName: 'foreignId'
+    tableIdentifierColumnName: process.env.COLUMN_ID_NAME || '_id',
+    foreignColumnName: process.env.COLUMN_FOREIGN_ID_NAME || '_foreignId'
   },
   log: {
     options: {
