@@ -125,7 +125,7 @@ function toDatabase(db, tableName, json) {
       manageTypes(table, json, skipId);
     }).catch(function(e) {
       // TODO JLL : could be better to synchronize the createTable to avoid the catch exception
-      alterTableSchema();
+      return alterTableSchema();
     });
   }
 
@@ -138,7 +138,7 @@ function toDatabase(db, tableName, json) {
     return db(tableName).columnInfo().then(function (columns) {
       var newColumns = _.omit(json, Object.keys(columns));
       return db.schema.table(tableName, function (table) {
-        manageTypes(table, newColumns);
+        return manageTypes(table, newColumns);
       });
     });
   }
@@ -164,6 +164,12 @@ function toDatabase(db, tableName, json) {
 module.exports = function(db) {
   return function(req, res) {
     var tableName = req.params && req.params.kind;
+    if (config.shortenColumnNames) {
+      var paths = tableName.split('-');
+      tableName = paths.map(function(p) {
+        return p.substring(0, p.length > 3 ? 3 : p.length);
+      }).join('');
+    }
     logger.info(path.basename(__filename) + ' - Post incoming JSON', {table: tableName});
 
     /**

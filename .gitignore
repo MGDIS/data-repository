@@ -1,3 +1,5 @@
+.vscode
+data-repository.sqlite
 .history
 build/
 node_modules/

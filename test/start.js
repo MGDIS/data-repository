@@ -361,40 +361,42 @@ it('Should manage multi-valued property', function(done) {
     response.body.should.be.an.object;
     response.body.should.have.property('saved', true);
     // check if table test exists
-    db.schema.hasTable(table).then(function (exists) {
-      if (!exists) {
-        done('Table ' + table + ' does not exist');
-      } else {
-        // check if string column is present
-        db.schema.hasColumn(table, array).then(function (has) {
-          if (has) {
-            done('Column ' + array + ' should not exist in ' + table);
-          } else {
-            var foreignTable = table+'_'+array;
-            db.schema.hasTable(foreignTable).then(function (exists) {
-              if (!exists) {
-                done('Table ' + foreignTable + ' does not exist');
-              } else {
-                // check value
-                db.select().from(foreignTable).then(function (results) {
-                  results.should.be.an.array;
-                  results.should.length(json[array].length);
-                  results[0].should.have.property('key', json[array][0].key);
-                  results[0].should.have.property('key2', json[array][0].key2);
-                  results[0].should.have.property('key3', 1/*json[array][0].key3*/);
-                  results[0].should.have.property('key4', json[array][0].key4);
-                  results[1].should.have.property('key', json[array][1].key);
-                  results[1].should.have.property('key2', json[array][1].key2);
-                  results[1].should.have.property('key3', 0/*json[array][1].key3*/);
-                  results[1].should.have.property('key4', json[array][1].key4);
-                  done();
-                });
-              }
-            });
-          }
-        });
-      }
-    });
+    setTimeout(function() {
+      db.schema.hasTable(table).then(function (exists) {
+        if (!exists) {
+          done('Table ' + table + ' does not exist');
+        } else {
+          // check if string column is present
+          db.schema.hasColumn(table, array).then(function (has) {
+            if (has) {
+              done('Column ' + array + ' should not exist in ' + table);
+            } else {
+              var foreignTable = table+'_'+array;
+              db.schema.hasTable(foreignTable).then(function (exists) {
+                if (!exists) {
+                  done('Table ' + foreignTable + ' does not exist');
+                } else {
+                  // check value
+                  db.select().from(foreignTable).then(function (results) {
+                    results.should.be.an.array;
+                    results.should.length(json[array].length);
+                    results[0].should.have.property('key', json[array][0].key);
+                    results[0].should.have.property('key2', json[array][0].key2);
+                    results[0].should.have.property('key3', 1/*json[array][0].key3*/);
+                    results[0].should.have.property('key4', json[array][0].key4);
+                    results[1].should.have.property('key', json[array][1].key);
+                    results[1].should.have.property('key2', json[array][1].key2);
+                    results[1].should.have.property('key3', 0/*json[array][1].key3*/);
+                    results[1].should.have.property('key4', json[array][1].key4);
+                    done();
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }, 1000);
   });
 });
 
@@ -416,77 +418,79 @@ it('Should manage real world JSON', function(done) {
     // check if table test exists
     var rowId = undefined;
     var addressId = undefined;
-    db.schema.hasTable(table).then(function (exists) {
-      if (!exists) {
-        done('Table ' + table + ' should exist');
-      } else {
-        db.select().from(table).then(function(results) {
-          results.should.be.an.array;
-          results.should.have.length(1);
-          results[0].should.have.property(tableIdentifierColumnName);
-          results[0].should.have.property('address');
-          rowId = results[0][tableIdentifierColumnName];
-          addressId = results[0]['address'];
-        });
-      }
-    }).then(db.select().from(addresses).then(function (exists) {
-      if (!exists) {
-        done('Table ' + addresses + ' should exist');
-      } else {
-        db.select().from(addresses).then(function(results) {
-          results.should.be.an.array;
-          results.should.have.length(1);
-          results[0].should.have.property(tableIdentifierColumnName, addressId);
-          results[0].should.have.property('number', 527);
-          results[0].should.have.property('street', 'Florence Avenue');
-          results[0].should.have.property('city', 'Trona');
-          results[0].should.have.property('state', 'California');
-          results[0].should.have.property('zipcode', 6149);
-          results[0].should.not.have.property(foreignColumnName);
-        });
-      }
-    })).then(db.select().from(tags).then(function (exists) {
-      if (!exists) {
-        done('Table ' + tags + ' should exist');
-      } else {
-        db.select().from(tags).then(function(results) {
-          results.should.be.an.array;
-          results.should.have.length(7);
-          results[0].should.have.property('tags', 'ad');
-          results[0].should.have.property(foreignColumnName, rowId);
-          results[1].should.have.property('tags', 'nostrud');
-          results[1].should.have.property(foreignColumnName, rowId);
-          results[2].should.have.property('tags', 'excepteur');
-          results[2].should.have.property(foreignColumnName, rowId);
-          results[3].should.have.property('tags', 'commodo');
-          results[3].should.have.property(foreignColumnName, rowId);
-          results[4].should.have.property('tags', 'ex');
-          results[4].should.have.property(foreignColumnName, rowId);
-          results[5].should.have.property('tags', 'cillum');
-          results[5].should.have.property(foreignColumnName, rowId);
-          results[6].should.have.property('tags', 'ullamco');
-          results[6].should.have.property(foreignColumnName, rowId);
-        });
-      }
-    })).then(db.select().from(friends).then(function (exists) {
-      if (!exists) {
-        done('Table ' + friends + ' should exist');
-      } else {
-        db.select().from(friends).then(function(results) {
-          results.should.be.an.array;
-          results.should.have.length(3);
-          results[0].should.have.property('id', 0);
-          results[0].should.have.property('name', 'Shana Riggs');
-          results[0].should.have.property(foreignColumnName, rowId);
-          results[1].should.have.property('id', 1);
-          results[1].should.have.property('name', 'Luna Brennan');
-          results[1].should.have.property(foreignColumnName, rowId);
-          results[2].should.have.property('id', 2);
-          results[2].should.have.property('name', 'Gray Berry');
-          results[2].should.have.property(foreignColumnName, rowId);
-          done();
-        });
-      }
-    }));
+    setTimeout(function() {
+      db.schema.hasTable(table).then(function (exists) {
+        if (!exists) {
+          done('Table ' + table + ' should exist');
+        } else {
+          db.select().from(table).then(function(results) {
+            results.should.be.an.array;
+            results.should.have.length(1);
+            results[0].should.have.property(tableIdentifierColumnName);
+            results[0].should.have.property('address');
+            rowId = results[0][tableIdentifierColumnName];
+            addressId = results[0]['address'];
+          });
+        }
+      }).then(db.select().from(addresses).then(function (exists) {
+        if (!exists) {
+          done('Table ' + addresses + ' should exist');
+        } else {
+          db.select().from(addresses).then(function(results) {
+            results.should.be.an.array;
+            results.should.have.length(1);
+            results[0].should.have.property(tableIdentifierColumnName, addressId);
+            results[0].should.have.property('number', 527);
+            results[0].should.have.property('street', 'Florence Avenue');
+            results[0].should.have.property('city', 'Trona');
+            results[0].should.have.property('state', 'California');
+            results[0].should.have.property('zipcode', 6149);
+            results[0].should.not.have.property(foreignColumnName);
+          });
+        }
+      })).then(db.select().from(tags).then(function (exists) {
+        if (!exists) {
+          done('Table ' + tags + ' should exist');
+        } else {
+          db.select().from(tags).then(function(results) {
+            results.should.be.an.array;
+            results.should.have.length(7);
+            results[0].should.have.property('tags', 'ad');
+            results[0].should.have.property(foreignColumnName, rowId);
+            results[1].should.have.property('tags', 'nostrud');
+            results[1].should.have.property(foreignColumnName, rowId);
+            results[2].should.have.property('tags', 'excepteur');
+            results[2].should.have.property(foreignColumnName, rowId);
+            results[3].should.have.property('tags', 'commodo');
+            results[3].should.have.property(foreignColumnName, rowId);
+            results[4].should.have.property('tags', 'ex');
+            results[4].should.have.property(foreignColumnName, rowId);
+            results[5].should.have.property('tags', 'cillum');
+            results[5].should.have.property(foreignColumnName, rowId);
+            results[6].should.have.property('tags', 'ullamco');
+            results[6].should.have.property(foreignColumnName, rowId);
+          });
+        }
+      })).then(db.select().from(friends).then(function (exists) {
+        if (!exists) {
+          done('Table ' + friends + ' should exist');
+        } else {
+          db.select().from(friends).then(function(results) {
+            results.should.be.an.array;
+            results.should.have.length(3);
+            results[0].should.have.property('id', 0);
+            results[0].should.have.property('name', 'Shana Riggs');
+            results[0].should.have.property(foreignColumnName, rowId);
+            results[1].should.have.property('id', 1);
+            results[1].should.have.property('name', 'Luna Brennan');
+            results[1].should.have.property(foreignColumnName, rowId);
+            results[2].should.have.property('id', 2);
+            results[2].should.have.property('name', 'Gray Berry');
+            results[2].should.have.property(foreignColumnName, rowId);
+            done();
+          });
+        }
+      }));
+    }, 1000);
   });
 });

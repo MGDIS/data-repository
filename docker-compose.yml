@@ -7,6 +7,7 @@
     environment:
       - DB_CLIENT=mysql
       - DB_CONNECTION=mysql://data-repository:data-repository@db:3306/data-repository
+      - SHORTEN_COLUMN_NAMES=true
   db:
     image: mysql
     container_name: db
