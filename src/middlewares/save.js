@@ -37,6 +37,7 @@ function toDatabase(db, tableName, json) {
     // create or alter the table named table+"_"+key
     var objectNameTable = tableName + '_' + key;
     if (config.shortenColumnNames === 'true' || config.shortenColumnNames === true) {
+      // keep only first three characters of key
       objectNameTable = tableName + key.substring(0, key.length > 3 ? 3 : key.length);
     }
     if(isArray) {
